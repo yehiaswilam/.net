@@ -1,1 +1,24 @@
-﻿
+﻿using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Large carpet price = 35");
+        Console.WriteLine("Small carpet price = 25");
+
+        Console.Write("Enter number of large carpets: ");
+        int large = Convert.ToInt32(Console.ReadLine());
+
+        Console.Write("Enter number of small carpets: ");
+        int small = Convert.ToInt32(Console.ReadLine());
+
+        double total = (large * 35) + (small * 25);
+        double service = total * 0.06;
+        double finalTotal = total + service;
+
+        Console.WriteLine("Total = " + total);
+        Console.WriteLine("Service = " + service);
+        Console.WriteLine("Final Total = " + finalTotal);
+    }
+}
