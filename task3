@@ -1,0 +1,538 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace StudentManagementSystem
+{
+    //  Instructor 
+    public class Instructor
+    {
+        public int InstructorId { get; set; }
+        public string Name { get; set; }
+        public string Specialization { get; set; }
+
+        public Instructor(int instructorId, string name, string specialization)
+        {
+            InstructorId = instructorId;
+            Name = name;
+            Specialization = specialization;
+        }
+
+        public string PrintDetails()
+        {
+            return $"[Instructor] ID: {InstructorId} | Name: {Name} | Specialization: {Specialization}";
+        }
+    }
+
+    //  Course 
+    public class Course
+    {
+        public int CourseId { get; set; }
+        public string Title { get; set; }
+        public Instructor Instructor { get; set; }
+
+        public Course(int courseId, string title, Instructor instructor)
+        {
+            CourseId = courseId;
+            Title = title;
+            Instructor = instructor;
+        }
+
+        public string PrintDetails()
+        {
+            string instructorName = Instructor != null ? Instructor.Name : "Not assigned";
+            return $"[Course] ID: {CourseId} | Title: {Title} | Instructor: {instructorName}";
+        }
+    }
+
+    //  Student 
+    public class Student
+    {
+        public int StudentId { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public List<Course> Courses { get; set; }
+
+        public Student(int studentId, string name, int age)
+        {
+            StudentId = studentId;
+            Name = name;
+            Age = age;
+            Courses = new List<Course>();
+        }
+
+        public bool Enroll(Course course)
+        {
+            if (course == null)
+                return false;
+
+            bool alreadyEnrolled = Courses.Any(c => c.CourseId == course.CourseId);
+            if (alreadyEnrolled)
+                return false;
+
+            Courses.Add(course);
+            return true;
+        }
+
+        public string PrintDetails()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"[Student] ID: {StudentId} | Name: {Name} | Age: {Age} | Courses: ");
+
+            if (Courses.Count == 0)
+            {
+                sb.Append("None");
+            }
+            else
+            {
+                sb.Append(string.Join(", ", Courses.Select(c => c.Title)));
+            }
+
+            return sb.ToString();
+        }
+    }
+
+    //  StudentManager(School) 
+    public class StudentManager
+    {
+        public List<Student> Students { get; set; }
+        public List<Course> Courses { get; set; }
+        public List<Instructor> Instructors { get; set; }
+
+        public StudentManager()
+        {
+            Students = new List<Student>();
+            Courses = new List<Course>();
+            Instructors = new List<Instructor>();
+        }
+
+        public bool AddStudent(Student student)
+        {
+            if (student == null)
+                return false;
+
+            if (Students.Any(s => s.StudentId == student.StudentId))
+                return false; 
+
+            Students.Add(student);
+            return true;
+        }
+
+        public bool AddCourse(Course course)
+        {
+            if (course == null)
+                return false;
+
+            if (Courses.Any(c => c.CourseId == course.CourseId))
+                return false;
+
+            Courses.Add(course);
+            return true;
+        }
+
+        public bool AddInstructor(Instructor instructor)
+        {
+            if (instructor == null)
+                return false;
+
+            if (Instructors.Any(i => i.InstructorId == instructor.InstructorId))
+                return false;
+
+            Instructors.Add(instructor);
+            return true;
+        }
+
+        public Student FindStudent(int studentId)
+        {
+            return Students.FirstOrDefault(s => s.StudentId == studentId);
+        }
+        public Student FindStudent(string name)
+        {
+            return Students.FirstOrDefault(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public Course FindCourse(int courseId)
+        {
+            return Courses.FirstOrDefault(c => c.CourseId == courseId);
+        }
+
+        public Course FindCourse(string title)
+        {
+            return Courses.FirstOrDefault(c => c.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public Instructor FindInstructor(int instructorId)
+        {
+            return Instructors.FirstOrDefault(i => i.InstructorId == instructorId);
+        }
+
+        public bool EnrollStudentInCourse(int studentId, int courseId)
+        {
+            Student student = FindStudent(studentId);
+            Course course = FindCourse(courseId);
+
+            if (student == null || course == null)
+                return false;
+
+            return student.Enroll(course);
+        }
+
+        public bool UpdateStudent(int studentId, string newName, int newAge)
+        {
+            Student student = FindStudent(studentId);
+            if (student == null)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(newName))
+                student.Name = newName;
+
+            if (newAge > 0)
+                student.Age = newAge;
+
+            return true;
+        }
+
+        public bool DeleteStudent(int studentId)
+        {
+            Student student = FindStudent(studentId);
+            if (student == null)
+                return false;
+
+            Students.Remove(student);
+            return true;
+        }
+    }
+
+    //  Program (Console menu) 
+    class Program
+    {
+        static StudentManager school = new StudentManager();
+
+        static void Main(string[] args)
+        {
+            bool running = true;
+
+            while (running)
+            {
+                ShowMenu();
+                string choice = Console.ReadLine();
+                Console.WriteLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AddStudentMenu();
+                        break;
+                    case "2":
+                        AddInstructorMenu();
+                        break;
+                    case "3":
+                        AddCourseMenu();
+                        break;
+                    case "4":
+                        EnrollStudentMenu();
+                        break;
+                    case "5":
+                        ShowAllStudents();
+                        break;
+                    case "6":
+                        ShowAllCourses();
+                        break;
+                    case "7":
+                        ShowAllInstructors();
+                        break;
+                    case "8":
+                        FindStudentMenu();
+                        break;
+                    case "9":
+                        FindCourseMenu();
+                        break;
+                    case "10":
+                        UpdateStudentMenu();
+                        break;
+                    case "11":
+                        DeleteStudentMenu();
+                        break;
+                    case "12":
+                        running = false;
+                        Console.WriteLine("Goodbye!");
+                        break;
+                    default:
+                        Console.WriteLine("Invalid option, please choose a number from the menu.");
+                        break;
+                }
+
+                Console.WriteLine();
+            }
+        }
+
+        static void ShowMenu()
+        {
+            Console.WriteLine("========== Student Management System ==========");
+            Console.WriteLine("1. Add Student");
+            Console.WriteLine("2. Add Instructor");
+            Console.WriteLine("3. Add Course");
+            Console.WriteLine("4. Enroll Student in Course");
+            Console.WriteLine("5. Show All Students");
+            Console.WriteLine("6. Show All Courses");
+            Console.WriteLine("7. Show All Instructors");
+            Console.WriteLine("8. Find Student (by ID or name)");
+            Console.WriteLine("9. Find Course (by ID or title)");
+            Console.WriteLine("10. Update Student Information");
+            Console.WriteLine("11. Delete Student");
+            Console.WriteLine("12. Exit");
+            Console.Write("Choose an option: ");
+        }
+
+        static void AddStudentMenu()
+        {
+            int id = ReadInt("Enter Student ID: ");
+
+            if (school.FindStudent(id) != null)
+            {
+                Console.WriteLine("A student with that ID already exists.");
+                return;
+            }
+
+            Console.Write("Enter Name: ");
+            string name = Console.ReadLine();
+            int age = ReadInt("Enter Age: ");
+
+            Student student = new Student(id, name, age); 
+
+            if (school.AddStudent(student))
+                Console.WriteLine("Student added successfully.");
+            else
+                Console.WriteLine("Could not add student.");
+        }
+
+        static void AddInstructorMenu()
+        {
+            int id = ReadInt("Enter Instructor ID: ");
+
+            if (school.FindInstructor(id) != null)
+            {
+                Console.WriteLine("An instructor with that ID already exists.");
+                return;
+            }
+
+            Console.Write("Enter Name: ");
+            string name = Console.ReadLine();
+            Console.Write("Enter Specialization: ");
+            string specialization = Console.ReadLine();
+
+            Instructor instructor = new Instructor(id, name, specialization);
+
+            if (school.AddInstructor(instructor))
+                Console.WriteLine("Instructor added successfully.");
+            else
+                Console.WriteLine("Could not add instructor.");
+        }
+
+        static void AddCourseMenu()
+        {
+            if (school.Instructors.Count == 0)
+            {
+                Console.WriteLine("No instructors exist yet. Please add an instructor first.");
+                return;
+            }
+
+            int id = ReadInt("Enter Course ID: ");
+
+            if (school.FindCourse(id) != null)
+            {
+                Console.WriteLine("A course with that ID already exists.");
+                return;
+            }
+
+            Console.Write("Enter Course Title: ");
+            string title = Console.ReadLine();
+
+            int instructorId = ReadInt("Enter Instructor ID for this course: ");
+            Instructor instructor = school.FindInstructor(instructorId);
+
+            if (instructor == null)
+            {
+                Console.WriteLine("No instructor found with that ID. Course was not created.");
+                return;
+            }
+
+            Course course = new Course(id, title, instructor);
+
+            if (school.AddCourse(course))
+                Console.WriteLine("Course added successfully.");
+            else
+                Console.WriteLine("Could not add course.");
+        }
+
+
+        static void EnrollStudentMenu()
+        {
+            int studentId = ReadInt("Enter Student ID: ");
+            int courseId = ReadInt("Enter Course ID: ");
+
+            if (school.FindStudent(studentId) == null)
+            {
+                Console.WriteLine("No student found with that ID.");
+                return;
+            }
+
+            if (school.FindCourse(courseId) == null)
+            {
+                Console.WriteLine("No course found with that ID.");
+                return;
+            }
+
+            if (school.EnrollStudentInCourse(studentId, courseId))
+                Console.WriteLine("Student enrolled successfully.");
+            else
+                Console.WriteLine("Enrollment failed (student may already be enrolled in this course).");
+        }
+
+
+        static void ShowAllStudents()
+        {
+            if (school.Students.Count == 0)
+            {
+                Console.WriteLine("No students registered yet.");
+                return;
+            }
+
+            Console.WriteLine("--- Students ---");
+            foreach (Student s in school.Students)
+                Console.WriteLine(s.PrintDetails());
+        }
+
+        static void ShowAllCourses()
+        {
+            if (school.Courses.Count == 0)
+            {
+                Console.WriteLine("No courses registered yet.");
+                return;
+            }
+
+            Console.WriteLine("--- Courses ---");
+            foreach (Course c in school.Courses)
+                Console.WriteLine(c.PrintDetails());
+        }
+
+        static void ShowAllInstructors()
+        {
+            if (school.Instructors.Count == 0)
+            {
+                Console.WriteLine("No instructors registered yet.");
+                return;
+            }
+
+            Console.WriteLine("--- Instructors ---");
+            foreach (Instructor i in school.Instructors)
+                Console.WriteLine(i.PrintDetails());
+        }
+
+
+        static void FindStudentMenu()
+        {
+            Console.Write("Search by (1) ID or (2) Name? ");
+            string mode = Console.ReadLine();
+
+            Student found = null;
+
+            if (mode == "1")
+            {
+                int id = ReadInt("Enter Student ID: ");
+                found = school.FindStudent(id);
+            }
+            else if (mode == "2")
+            {
+                Console.Write("Enter Student Name: ");
+                string name = Console.ReadLine();
+                found = school.FindStudent(name);
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice.");
+                return;
+            }
+
+            Console.WriteLine(found != null ? found.PrintDetails() : "Student not found.");
+        }
+
+        static void FindCourseMenu()
+        {
+            Console.Write("Search by (1) ID or (2) Title? ");
+            string mode = Console.ReadLine();
+
+            Course found = null;
+
+            if (mode == "1")
+            {
+                int id = ReadInt("Enter Course ID: ");
+                found = school.FindCourse(id);
+            }
+            else if (mode == "2")
+            {
+                Console.Write("Enter Course Title: ");
+                string title = Console.ReadLine();
+                found = school.FindCourse(title);
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice.");
+                return;
+            }
+
+            Console.WriteLine(found != null ? found.PrintDetails() : "Course not found.");
+        }
+
+
+        static void UpdateStudentMenu()
+        {
+            int id = ReadInt("Enter Student ID to update: ");
+            Student student = school.FindStudent(id);
+
+            if (student == null)
+            {
+                Console.WriteLine("No student found with that ID.");
+                return;
+            }
+
+            Console.WriteLine($"Current details -> {student.PrintDetails()}");
+
+            Console.Write("Enter new name (leave blank to keep current): ");
+            string newName = Console.ReadLine();
+
+            Console.Write("Enter new age (0 to keep current): ");
+            string ageInput = Console.ReadLine();
+            int newAge = 0;
+            int.TryParse(ageInput, out newAge);
+
+            if (school.UpdateStudent(id, newName, newAge))
+                Console.WriteLine("Student updated successfully.");
+            else
+                Console.WriteLine("Update failed.");
+        }
+
+        static void DeleteStudentMenu()
+        {
+            int id = ReadInt("Enter Student ID to delete: ");
+
+            if (school.DeleteStudent(id))
+                Console.WriteLine("Student deleted successfully.");
+            else
+                Console.WriteLine("No student found with that ID.");
+        }
+
+
+        static int ReadInt(string prompt)
+        {
+            Console.Write(prompt);
+            int value;
+            while (!int.TryParse(Console.ReadLine(), out value))
+            {
+                Console.Write("Please enter a valid number: ");
+            }
+            return value;
+        }
+    }
+}
