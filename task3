@@ -536,3 +536,50 @@ namespace StudentManagementSystem
         }
     }
 }
+
+الفرق بين Class و Struct و Record وما هو الـ Indexer في C#
+أولًا: ما هي الـ Class؟
+التعريف
+
+الـ Class هي نوع مرجعي (Reference Type) في لغة C#، وتُستخدم لإنشاء الكائنات (Objects). تحتوي على بيانات (Properties أو Fields) ووظائف (Methods)، كما أنها تدعم جميع مبادئ البرمجة كائنية التوجه (OOP).
+
+مميزاتها
+تعتبر Reference Type.
+يتم تخزينها في الـ Heap Memory.
+تدعم الوراثة (Inheritance).
+يمكن أن تحتوي على Constructors وProperties وMethods وEvents.
+يمكن لأكثر من متغير الإشارة إلى نفس الكائن.
+  
+ثانيًا: ما هي الـ Struct؟
+التعريف
+
+الـ Struct هي نوع قيمي (Value Type) يُستخدم لتخزين كميات صغيرة من البيانات المرتبطة ببعضها. وعند نسخ Struct يتم نسخ البيانات نفسها وليس المرجع.
+
+مميزاتها
+تعتبر Value Type.
+يتم تخزينها غالبًا في الـ Stack Memory.
+لا تدعم الوراثة من Class أو Struct آخر.
+أسرع في التعامل مع البيانات الصغيرة.
+كل نسخة مستقلة عن الأخرى.
+
+ثالثًا: ما هي الـ Record؟
+التعريف
+
+الـ Record هي نوع تم إضافته في C# 9 ويُستخدم غالبًا مع البيانات التي لا تتغير (Immutable Data)، كما أنه يقارن الكائنات بناءً على قيمها وليس أماكن تخزينها في الذاكرة.
+
+مميزاتها
+تعتبر Reference Type.
+تعتمد على Value Equality.
+مناسبة للبيانات الثابتة.
+تدعم خاصية with لإنشاء نسخة معدلة.
+تقلل كمية الكود المكتوب.
+
+What is an Indexer?
+Definition
+
+An Indexer allows an object to be indexed like an array using square brackets ([]).
+
+Instead of calling a method, you can access data using an index.
+
+
+يبشمهندس دلوقتس انا جبت السيرش دا من AI عادي ولا ف مشكله عشان انا مش عارف
